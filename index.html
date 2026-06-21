@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="theme-color" content="#1565C0" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Taxas" />
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<title>Taxas das Excursões — Moda Center</title>
+<style>
+  :root{
+    --azul:#1565C0; --azul2:#2196F3; --azul-bg:#e8f1fb;
+    --bg:#f3f6fb; --card:#ffffff; --texto:#16243a; --suave:#5b6b82;
+    --linha:#e3e9f2; --cinza:#9aa6b8;
+    --verde:#16a34a; --verde-bg:#e7f7ee;
+    --ambar:#d97706; --ambar-bg:#fdf1e0;
+    --vermelho:#dc2626;
+    --sombra:0 1px 3px rgba(20,40,70,.08), 0 4px 16px rgba(20,40,70,.06);
+    --input-bg:#fbfcfe; --input-focus:#ffffff; --pend-bg:#eef1f6; --danger-bg:#fdeaea; --grip:#d7deea;
+  }
+  body.dark{
+    --azul-bg:#16304d;
+    --bg:#0f1724; --card:#1a2536; --texto:#e8eef7; --suave:#9aa7bd;
+    --linha:#2b3a54; --cinza:#8593aa;
+    --verde-bg:#173a22; --ambar-bg:#3a2c12;
+    --input-bg:#141d2e; --input-focus:#1f2a3e; --pend-bg:#26334a; --danger-bg:#3a1d1d; --grip:#3a4a66;
+    --sombra:0 1px 3px rgba(0,0,0,.35), 0 4px 16px rgba(0,0,0,.3);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--texto);
+    padding-bottom:90px; -webkit-font-smoothing:antialiased;
+  }
+  /* ---------- Header ---------- */
+  header{
+    position:sticky; top:0; z-index:20;
+    background:linear-gradient(135deg,var(--azul),var(--azul2));
+    color:#fff; padding:14px 16px 12px;
+    box-shadow:0 2px 12px rgba(21,101,192,.25);
+  }
+  .htop{display:flex; align-items:center; justify-content:space-between; gap:10px}
+  .htitle{font-size:18px; font-weight:800; letter-spacing:.2px; line-height:1.1}
+  .hsub{font-size:11.5px; opacity:.9; margin-top:2px; font-weight:500}
+  .menu-btn{
+    background:rgba(255,255,255,.18); border:none; color:#fff;
+    width:40px; height:40px; border-radius:12px; font-size:20px;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .conf-chip{
+    margin-top:11px; display:inline-flex; align-items:center; gap:7px;
+    background:rgba(255,255,255,.18); border-radius:999px;
+    padding:6px 12px; font-size:12.5px; font-weight:600; cursor:pointer;
+  }
+  .conf-chip b{font-weight:800}
+  /* ---------- Busca + filtros ---------- */
+  .toolbar{
+    position:sticky; top:0; z-index:15; background:var(--bg);
+    padding:12px 14px 4px;
+  }
+  .search{
+    display:flex; align-items:center; gap:8px; background:var(--card);
+    border:1px solid var(--linha); border-radius:14px; padding:11px 14px;
+    box-shadow:var(--sombra);
+  }
+  .search input{
+    border:none; outline:none; font-size:16px; width:100%; background:transparent; color:var(--texto);
+  }
+  .search svg{flex:none}
+  .chips{display:flex; gap:8px; overflow-x:auto; padding:11px 2px 6px; scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{
+    flex:none; border:1px solid var(--linha); background:var(--card);
+    color:var(--suave); padding:8px 14px; border-radius:999px;
+    font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap;
+  }
+  .chip.on{background:var(--azul); color:#fff; border-color:var(--azul)}
+  .chip .n{opacity:.7; font-weight:700; margin-left:3px}
+  .chip.on .n{opacity:.9}
+  .counter{
+    font-size:12.5px; color:var(--suave); padding:2px 4px 10px; font-weight:600;
+  }
+  .counter b{color:var(--azul)}
+  /* ---------- Lista ---------- */
+  .list{padding:0 14px}
+  .card{
+    background:var(--card); border:1px solid var(--linha); border-radius:14px;
+    padding:13px 14px; margin-bottom:10px; box-shadow:var(--sombra);
+    display:flex; align-items:center; gap:12px; cursor:pointer;
+    border-left:4px solid var(--cinza);
+  }
+  .card.s-nao{border-left-color:var(--verde)}
+  .card.s-sim{border-left-color:var(--ambar)}
+  .card .body{flex:1; min-width:0}
+  .nome{font-size:15.5px; font-weight:700; line-height:1.2}
+  .nova-tag{
+    font-size:9.5px; font-weight:800; color:var(--azul); background:var(--azul-bg);
+    border-radius:6px; padding:1px 5px; margin-left:6px; vertical-align:middle;
+  }
+  .meta{font-size:12px; color:var(--suave); margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .badge{
+    flex:none; font-size:12px; font-weight:800; border-radius:10px;
+    padding:7px 10px; text-align:center; min-width:64px;
+  }
+  .b-pend{background:var(--pend-bg); color:var(--cinza)}
+  .b-nao{background:var(--verde-bg); color:var(--verde)}
+  .b-sim{background:var(--ambar-bg); color:var(--ambar)}
+  .b-sim .v{display:block; font-size:14px; line-height:1.1}
+  .empty{text-align:center; color:var(--suave); padding:50px 20px; font-size:14px}
+  .empty .big{font-size:40px; margin-bottom:10px}
+  /* ---------- Botão flutuante ---------- */
+  .fab{
+    position:fixed; right:18px; bottom:20px; z-index:30;
+    background:var(--azul); color:#fff; border:none; border-radius:16px;
+    padding:15px 20px; font-size:15px; font-weight:800; cursor:pointer;
+    box-shadow:0 6px 20px rgba(21,101,192,.4); display:flex; align-items:center; gap:8px;
+  }
+  /* ---------- Sheet / Modal ---------- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(15,28,48,.45); z-index:40;
+    display:none; align-items:flex-end; justify-content:center;
+  }
+  .overlay.open{display:flex}
+  .sheet{
+    background:var(--card); width:100%; max-width:520px;
+    border-radius:22px 22px 0 0; padding:8px 18px 26px;
+    max-height:92vh; overflow-y:auto; animation:up .25s ease;
+  }
+  @keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:translateY(0);opacity:1}}
+  .grip{width:42px; height:5px; background:var(--grip); border-radius:99px; margin:8px auto 14px}
+  .sheet h2{margin:0 0 2px; font-size:19px; font-weight:800}
+  .sheet .sub{color:var(--suave); font-size:13px; margin-bottom:18px}
+  .field{margin-bottom:16px}
+  .field label{display:block; font-size:13px; font-weight:700; color:var(--suave); margin-bottom:7px}
+  .field input, .field textarea, .field select{
+    width:100%; border:1.5px solid var(--linha); border-radius:12px;
+    padding:13px 14px; font-size:16px; outline:none; color:var(--texto); background:var(--input-bg);
+  }
+  .field input:focus, .field textarea:focus, .field select:focus{border-color:var(--azul2); background:var(--input-focus)}
+  .field select{
+    appearance:none; -webkit-appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235b6b82' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 14px center; padding-right:40px;
+  }
+  .field textarea{resize:none; min-height:64px}
+  /* toggle cobra taxa */
+  .seg{display:flex; gap:10px}
+  .seg button{
+    flex:1; border:1.5px solid var(--linha); background:var(--input-bg); border-radius:12px;
+    padding:14px 8px; font-size:15px; font-weight:800; cursor:pointer; color:var(--suave);
+  }
+  .seg button.on-sim{background:var(--ambar-bg); border-color:var(--ambar); color:var(--ambar)}
+  .seg button.on-nao{background:var(--verde-bg); border-color:var(--verde); color:var(--verde)}
+  .valor-wrap{margin-top:14px}
+  .valor-input{display:flex; align-items:center; border:1.5px solid var(--ambar); border-radius:12px; background:var(--input-focus); overflow:hidden}
+  .valor-input span{padding:0 4px 0 14px; font-size:18px; font-weight:800; color:var(--ambar)}
+  .valor-input input{border:none; background:transparent; font-size:22px; font-weight:800; padding:13px 8px; width:100%; outline:none; color:var(--ambar)}
+  .btn{
+    width:100%; border:none; border-radius:14px; padding:16px; font-size:16px;
+    font-weight:800; cursor:pointer; margin-top:6px;
+  }
+  .btn-primary{background:var(--azul); color:#fff}
+  .btn-ghost{background:var(--pend-bg); color:var(--suave)}
+  .btn-danger{background:var(--danger-bg); color:var(--vermelho)}
+  .row2{display:flex; gap:10px}
+  .row2 .btn{margin-top:0}
+  .small{font-size:12.5px; color:var(--suave); margin-top:10px; line-height:1.5}
+  .editar-btn{
+    background:var(--azul-bg); color:var(--azul); border:none; border-radius:10px;
+    padding:9px 13px; font-size:13px; font-weight:700; cursor:pointer; margin-bottom:16px;
+  }
+  body.dark .editar-btn{color:#7db4ff}
+  /* menu list */
+  .mitem{
+    display:flex; align-items:center; gap:14px; padding:16px 6px; cursor:pointer;
+    border-bottom:1px solid var(--linha); font-size:15.5px; font-weight:600;
+  }
+  .mitem:last-child{border-bottom:none}
+  .mitem .ic{font-size:20px; width:26px; text-align:center}
+  .mitem.danger{color:var(--vermelho)}
+  /* toast */
+  .toast{
+    position:fixed; left:50%; bottom:96px; transform:translateX(-50%) translateY(20px);
+    background:#16243a; color:#fff; padding:13px 20px; border-radius:12px;
+    font-size:14px; font-weight:600; z-index:60; opacity:0; pointer-events:none;
+    transition:.3s; max-width:90%; text-align:center; box-shadow:0 6px 24px rgba(0,0,0,.3);
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  /* import resumo */
+  .resumo{background:var(--azul-bg); border-radius:14px; padding:16px; margin:6px 0 16px}
+  .resumo .lin{display:flex; justify-content:space-between; font-size:14px; padding:5px 0; font-weight:600}
+  .resumo .lin b{font-weight:800}
+  .conf-box{background:var(--ambar-bg); border:1px solid var(--ambar); border-radius:12px; padding:13px; margin-bottom:12px}
+  .conf-box .t{font-weight:800; font-size:14px; margin-bottom:8px; color:var(--ambar)}
+  .conf-opt{display:flex; gap:8px; margin-top:8px}
+  .conf-opt button{flex:1; border:1.5px solid var(--linha); background:var(--input-focus); border-radius:10px; padding:11px; font-size:13px; font-weight:700; cursor:pointer}
+  .hide{display:none}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="htop">
+    <div>
+      <div class="htitle">Taxas das Excursões</div>
+      <div class="hsub">Moda Center · coleta em campo</div>
+    </div>
+    <div style="display:flex; gap:8px">
+      <button class="menu-btn" id="themeBtn" onclick="toggleTema()">🌙</button>
+      <button class="menu-btn" onclick="abrirMenu()">⋯</button>
+    </div>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="search">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9aa6b8" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <input id="busca" placeholder="Buscar excursão..." oninput="render()" autocomplete="off">
+  </div>
+  <div class="chips" id="chips"></div>
+  <div class="counter" id="counter"></div>
+</div>
+
+<div class="list" id="lista"></div>
+
+<button class="fab" onclick="novaExcursao()">＋ Nova</button>
+
+<!-- Editor de taxa -->
+<div class="overlay" id="ovEditor">
+  <div class="sheet">
+    <div class="grip"></div>
+    <h2 id="edNome">—</h2>
+    <div class="sub" id="edMeta"></div>
+    <button class="editar-btn" onclick="abrirEditInfo()">✏️ Editar dados da excursão</button>
+
+    <div class="field">
+      <label>Essa excursão cobra taxa?</label>
+      <div class="seg">
+        <button id="segNao" onclick="setCobra('nao')">Não cobra</button>
+        <button id="segSim" onclick="setCobra('sim')">Cobra taxa</button>
+      </div>
+      <div class="valor-wrap hide" id="valorWrap">
+        <div class="valor-input">
+          <span>R$</span>
+          <input id="edValor" type="number" inputmode="decimal" step="0.50" placeholder="0,00">
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Observação (opcional)</label>
+      <textarea id="edObs" placeholder="Ex.: taxa só pra caixa grande, paga no embarque..."></textarea>
+    </div>
+
+    <button class="btn btn-primary" onclick="salvarRegistro()">Salvar</button>
+    <button class="btn btn-ghost" style="margin-top:10px" onclick="fechar('ovEditor')">Cancelar</button>
+    <div class="row2" id="limparWrap" style="margin-top:10px">
+      <button class="btn btn-danger" onclick="limparRegistro()">Apagar marcação</button>
+    </div>
+  </div>
+</div>
+
+<!-- Nova excursão -->
+<div class="overlay" id="ovEditInfo">
+  <div class="sheet">
+    <div class="grip"></div>
+    <h2>Editar dados</h2>
+    <div class="sub">Corrija qualquer informação que estiver errada na lista.</div>
+    <div class="field">
+      <label>Nome da excursão *</label>
+      <input id="eiNome" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>Vaga / Setor</label>
+      <input id="eiVaga" placeholder="Ex.: Setor Amarelo • Vaga 114A" autocomplete="off">
+    </div>
+    <button class="btn btn-primary" onclick="salvarEditInfo()">Salvar alterações</button>
+    <button class="btn btn-ghost" style="margin-top:10px" onclick="fechar('ovEditInfo')">Cancelar</button>
+  </div>
+</div>
+
+<div class="overlay" id="ovNova">
+  <div class="sheet">
+    <div class="grip"></div>
+    <h2>Nova excursão</h2>
+    <div class="sub">Só pra quando a excursão não está na lista.</div>
+    <div class="field">
+      <label>Nome da excursão *</label>
+      <input id="nvNome" placeholder="Ex.: Silva Turismo" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>Setor (opcional)</label>
+      <select id="nvSetor">
+        <option value="">Selecione o setor...</option>
+        <option value="Azul">Azul</option>
+        <option value="Verde">Verde</option>
+        <option value="Vermelho">Vermelho</option>
+        <option value="Amarelo">Amarelo</option>
+        <option value="Laranja">Laranja</option>
+        <option value="Branco">Branco</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Número da vaga (opcional)</label>
+      <input id="nvNumero" type="number" inputmode="numeric" pattern="[0-9]*" placeholder="Ex.: 12" autocomplete="off">
+    </div>
+    <button class="btn btn-primary" onclick="salvarNova()">Adicionar e marcar taxa</button>
+    <button class="btn btn-ghost" style="margin-top:10px" onclick="fechar('ovNova')">Cancelar</button>
+  </div>
+</div>
+
+<!-- Menu -->
+<div class="overlay" id="ovMenu">
+  <div class="sheet">
+    <div class="grip"></div>
+    <h2>Menu</h2>
+    <div class="sub" id="menuSub"></div>
+    <div class="mitem" onclick="toggleTema()"><span class="ic" id="temaIcon">🌙</span><div>Modo noturno<br><span class="small" style="margin:0">Alterna entre claro e escuro</span></div></div>
+    <div class="mitem" onclick="exportar()"><span class="ic">📤</span><div>Exportar meus dados<br><span class="small" style="margin:0">Gera um arquivo pra mandar no WhatsApp</span></div></div>
+    <div class="mitem" onclick="abrirImport()"><span class="ic">📥</span><div>Importar e juntar<br><span class="small" style="margin:0">Une os arquivos dos colegas numa lista só</span></div></div>
+    <div class="mitem" onclick="exportarComprovante()"><span class="ic">🧾</span><div>Exportar pro app de comprovantes<br><span class="small" style="margin:0">Só as que cobram taxa, prontas pra usar</span></div></div>
+    <div class="mitem" onclick="importarLista()"><span class="ic">📋</span><div>Carregar lista de excursões<br><span class="small" style="margin:0">Substitui a base por uma lista completa</span></div></div>
+    <div class="mitem danger" onclick="limparTudo()"><span class="ic">🗑️</span><div>Apagar tudo deste aparelho</div></div>
+  </div>
+</div>
+
+<!-- Importar / juntar -->
+<div class="overlay" id="ovImport">
+  <div class="sheet">
+    <div class="grip"></div>
+    <h2>Importar e juntar</h2>
+    <div class="sub">Selecione os arquivos que os colegas te mandaram (pode escolher vários de uma vez).</div>
+    <button class="btn btn-primary" onclick="document.getElementById('fileImport').click()">Escolher arquivos</button>
+    <input type="file" id="fileImport" accept=".json,application/json" multiple class="hide" onchange="processarImport(event)">
+    <div id="importResultado"></div>
+    <button class="btn btn-ghost" style="margin-top:14px" onclick="fechar('ovImport')">Fechar</button>
+  </div>
+</div>
+
+<input type="file" id="fileLista" accept=".json,application/json" class="hide" onchange="processarLista(event)">
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============== BASE DE EXCURSÕES (lista oficial Moda Center) ==============
+   Lista completa com as 380 excursões. Dá pra atualizar/substituir
+   pelo menu "Carregar lista de excursões". */
+const SEED = [
+  {"nome": "Abdon Turismo", "vaga": "Setor Laranja • Vaga 33", "tel": ""},
+  {"nome": "Abobrinha Viagens", "vaga": "Lateral do Setor Verde • Vaga 51", "tel": ""},
+  {"nome": "ACVS Turismo", "vaga": "Setor Vermelho • Vaga 96", "tel": ""},
+  {"nome": "ADR Receptivo", "vaga": "Setor Amarelo • Vaga 23", "tel": ""},
+  {"nome": "Adriano Transportes", "vaga": "Setor Amarelo • Vaga 114A", "tel": ""},
+  {"nome": "Adriano Tur", "vaga": "Setor Vermelho • Vaga 44", "tel": ""},
+  {"nome": "Aécio Tur", "vaga": "Setor Branco • Vaga 91", "tel": ""},
+  {"nome": "AG Queiroz", "vaga": "Lateral do Setor Verde • Vaga 97", "tel": ""},
+  {"nome": "Aldenor Viagens", "vaga": "Setor Laranja - Área das Vans • Vaga 99", "tel": ""},
+  {"nome": "Aldenora Turismo", "vaga": "Lateral do Setor Azul • Vaga 02/04", "tel": ""},
+  {"nome": "Alex Viagens", "vaga": "Lateral do Setor Laranja • Vaga 28/30", "tel": ""},
+  {"nome": "Alexandre", "vaga": "Setor Branco • Vaga 91", "tel": ""},
+  {"nome": "Alexandre Fortunato", "vaga": "Setor Verde • Vaga 77/78", "tel": ""},
+  {"nome": "Ali Turismo (Sandrack)", "vaga": "Setor Amarelo • Vaga 45", "tel": ""},
+  {"nome": "Alice Transportes", "vaga": "Setor Branco • Vaga 95", "tel": ""},
+  {"nome": "Allan Fretante", "vaga": "Setor Vermelho - Área da Vans • Vaga 63", "tel": ""},
+  {"nome": "Alves Tur", "vaga": "Lateral do Setor Laranja • Vaga 16", "tel": ""},
+  {"nome": "AMS Transportes & Logística", "vaga": "Setor Laranja - Área do Gerador • Vaga 12", "tel": ""},
+  {"nome": "Ana's Tur", "vaga": "Lateral do Setor Laranja • Vaga 02/04", "tel": ""},
+  {"nome": "Anderson Viagens", "vaga": "Setor Verde • Vaga 53", "tel": ""},
+  {"nome": "André - Rio Tinto", "vaga": "Setor Laranja • Vaga 121", "tel": ""},
+  {"nome": "André Mazarope", "vaga": "Setor Azul • Vaga 137", "tel": ""},
+  {"nome": "Andrea Costa", "vaga": "Setor Verde • Vaga 79", "tel": ""},
+  {"nome": "Arlan Tour", "vaga": "Setor Branco • Vaga 121", "tel": ""},
+  {"nome": "ATF Turismo / Igor", "vaga": "Setor Vermelho • Vaga 70", "tel": ""},
+  {"nome": "AWG Turismo", "vaga": "Setor Amarelo - Área das Vans • Vaga 16", "tel": ""},
+  {"nome": "Bagaça Transportes", "vaga": "Área do gerador • Vaga 10", "tel": ""},
+  {"nome": "Baiano VIP", "vaga": "Setor Vermelho • Vaga 99", "tel": ""},
+  {"nome": "Baiton Excursão", "vaga": "Setor Branco • Vaga 34", "tel": ""},
+  {"nome": "Barreto Express", "vaga": "Setor Azul • Vaga 130", "tel": ""},
+  {"nome": "Batista Viagens", "vaga": "Setor Vermelho • Vaga 88", "tel": ""},
+  {"nome": "Belarmino Mendes", "vaga": "Frontal do - Setor Azul • Vaga 20", "tel": ""},
+  {"nome": "Bento Turismo", "vaga": "Lateral do Setor Laranja • Vaga 26", "tel": ""},
+  {"nome": "Berel Excursão", "vaga": "Setor Branco • Vagas 126/128", "tel": ""},
+  {"nome": "Beto Excursão (Guarabira)", "vaga": "Setor Azul • Vaga 115", "tel": ""},
+  {"nome": "Beto Excursão (Natal)", "vaga": "Setor Vermelho • Vaga 64 A", "tel": ""},
+  {"nome": "Bigode Turismo", "vaga": "Setor Branco • Vaga 111", "tel": ""},
+  {"nome": "Biuzinho Turismo", "vaga": "Setor Amarelo • Vaga 46", "tel": ""},
+  {"nome": "Box Tur", "vaga": "Lateral do Setor Do Laranja • Vaga 28", "tel": ""},
+  {"nome": "Bruna Transporte", "vaga": "Setor Vermelho • Vaga 55", "tel": ""},
+  {"nome": "C&C Transportes", "vaga": "Setor Vermelho • Vaga 77", "tel": ""},
+  {"nome": "Cabana Tur", "vaga": "Setor Verde • Vaga 84/86", "tel": ""},
+  {"nome": "Cafuringa Turismo", "vaga": "Setor Amarelo • Vaga 116", "tel": ""},
+  {"nome": "Carlinhos da Sulanca", "vaga": "Lateral do Setor Azul • Vaga 26", "tel": ""},
+  {"nome": "Carlos Viagens", "vaga": "Setor Vermelho • Vaga 58", "tel": ""},
+  {"nome": "Carol Tur", "vaga": "Setor Vermelho • Vaga 80", "tel": ""},
+  {"nome": "Carvalho Exscursão", "vaga": "Setor Azul • Vaga 108", "tel": ""},
+  {"nome": "Cebola Viagens", "vaga": "Setor Vermelho • Vaga 83", "tel": ""},
+  {"nome": "Cesar Tur", "vaga": "Setor Amarelo • Vaga 120", "tel": ""},
+  {"nome": "CH Turismo", "vaga": "Setro Branco • Vaga 93", "tel": ""},
+  {"nome": "Chico Dias", "vaga": "Setor Verde • Vaga 79", "tel": ""},
+  {"nome": "Chiquinho Transportes", "vaga": "Lateral do Setor Verde • Vaga 53/54", "tel": ""},
+  {"nome": "Cipriano Tur", "vaga": "Setor Verde • Vaga 74", "tel": ""},
+  {"nome": "Cllaf Logística", "vaga": "Setor Vermelho • Vaga 63/65", "tel": ""},
+  {"nome": "Corrinha Turismo", "vaga": "Lateral do Setor Laranja • Vaga 41A", "tel": ""},
+  {"nome": "Cristiano Tur", "vaga": "Setor Amarelo • Vaga 131", "tel": ""},
+  {"nome": "Cycy Turismo", "vaga": "Setor Vermelho • Vaga 49", "tel": ""},
+  {"nome": "Dairlon", "vaga": "Lateral do Setor Azul • Vaga 36", "tel": ""},
+  {"nome": "Danda Turismo", "vaga": "Setor Verde • Vaga 73", "tel": ""},
+  {"nome": "Danilo Turismo", "vaga": "Setor Laranja • Vaga 12", "tel": ""},
+  {"nome": "Danturismo", "vaga": "Setor Verde • Vaga 84", "tel": ""},
+  {"nome": "Daví Turismo", "vaga": "Lateral do Setor Azul • Vaga 32", "tel": ""},
+  {"nome": "David Excursões", "vaga": "Lateral do Setor Branco • Vagas 19/20", "tel": ""},
+  {"nome": "Day Turismo", "vaga": "Lateral do Setor Azul • Vaga 08", "tel": ""},
+  {"nome": "Dé Turismo", "vaga": "Lateral do Setor Azul • Vaga 40", "tel": ""},
+  {"nome": "Dege Tur", "vaga": "Setor Verde • Vaga 72", "tel": ""},
+  {"nome": "Denilson Transportes", "vaga": "Lateral do Setor Laranja • Vaga 02", "tel": ""},
+  {"nome": "Dervânia Tur", "vaga": "Setor Branco • Vaga 134", "tel": ""},
+  {"nome": "Deyse Viagens", "vaga": "Setor Amarelo • Vaga 138/140", "tel": ""},
+  {"nome": "DF Turismo", "vaga": "Setor Amarelo • Vaga 135/137", "tel": ""},
+  {"nome": "Dielson / Alexandra", "vaga": "Setor Azul • Vaga 112", "tel": ""},
+  {"nome": "Dinho Turismo", "vaga": "Setor Branco • Vaga 105", "tel": ""},
+  {"nome": "DL Turismo", "vaga": "Lateral do Setor Laranja • Vaga 17", "tel": ""},
+  {"nome": "D'Nilton", "vaga": "Setor Amarelo • Vaga 99", "tel": ""},
+  {"nome": "Dois Irmãos Turismo", "vaga": "Setor Amarelo • Vaga 114", "tel": ""},
+  {"nome": "Dona Suely", "vaga": "Lateral do Setor Branco • Vaga 38", "tel": ""},
+  {"nome": "Donato Viagens", "vaga": "Setor Amarelo • Vaga 31", "tel": ""},
+  {"nome": "Durval Tur", "vaga": "Setor Vermelho • Vaga 58,58", "tel": ""},
+  {"nome": "Ebenezer", "vaga": "Lateral do Setor Laranja • Vaga 23/25", "tel": ""},
+  {"nome": "EIF Viagens e Receptivo (Fred)", "vaga": "Lateral do Setor Branco • Vaga 29", "tel": ""},
+  {"nome": "Elma Tur", "vaga": "Setor Vermelho • Vaga 60", "tel": ""},
+  {"nome": "Ely Turismo", "vaga": "Setor Amarelo • Vaga 94/96", "tel": ""},
+  {"nome": "Emílio Tur", "vaga": "Setor Azul • Vaga 31", "tel": ""},
+  {"nome": "Enaide Viagens", "vaga": "Setor Vermelho • Vaga 76", "tel": ""},
+  {"nome": "Encomendas Tur", "vaga": "Setor Azul • Vaga 104", "tel": ""},
+  {"nome": "Enoque Viagens", "vaga": "Lateral do Setor Branco • Vagas 07/08", "tel": ""},
+  {"nome": "ER Turismo", "vaga": "Lateral do Setor Laranja • Vaga 10", "tel": ""},
+  {"nome": "Erivan", "vaga": "Setor Amarelo • Vaga 21", "tel": ""},
+  {"nome": "Ernesto Veneiorão", "vaga": "Setor Verde - Área das Vans • Vaga 80", "tel": ""},
+  {"nome": "Essencial (Djavan)", "vaga": "Setor Vermelho • Vaga 88 A", "tel": ""},
+  {"nome": "Ester Excursões", "vaga": "Setor Vermelho • Vaga 44 A", "tel": ""},
+  {"nome": "Estratégia Logística", "vaga": "Setor Amarelo • Vaga 107", "tel": ""},
+  {"nome": "Estrela D'alva", "vaga": "Lateral do Setor Laranja • Vaga 44", "tel": ""},
+  {"nome": "Everaldo Tur", "vaga": "Setor Vermelho • Vaga 91", "tel": ""},
+  {"nome": "Evolution Transporte", "vaga": "Frontal do - Setor Azul • Vaga 110", "tel": ""},
+  {"nome": "Expresso do Vale", "vaga": "Lateral do Setor Azul • Vaga 40", "tel": ""},
+  {"nome": "Expresso Macêdo", "vaga": "Lateral do Setor Laranja • Vaga 38", "tel": ""},
+  {"nome": "Expresso Pará", "vaga": "Lateral do Setor Branco • Vaga 36", "tel": ""},
+  {"nome": "Ezonildo", "vaga": "Setor Vermelho • Vaga 59", "tel": ""},
+  {"nome": "F&T Tur", "vaga": "Setor Vermelho • Vaga 54", "tel": ""},
+  {"nome": "F.E Transporte", "vaga": "Setor Laranja - Área do Gerador • Vaga 03", "tel": ""},
+  {"nome": "Fabinho Transportes", "vaga": "Lateral do Setor Verde • Vaga 96", "tel": ""},
+  {"nome": "Fábio Excursão", "vaga": "Setor Vermelho • Vaga 64 B", "tel": ""},
+  {"nome": "Fábio Viagens", "vaga": "Setor Laranja • Vaga 102", "tel": ""},
+  {"nome": "Facol Logística", "vaga": "Setor Laranja - Área do Gerador • Vaga 01", "tel": ""},
+  {"nome": "Felipe de Mossoró", "vaga": "Lateral do Setor Branco / Vaga 103 - Setor Branco • Vaga 24", "tel": ""},
+  {"nome": "Felipe Viagens", "vaga": "Setor Azul • Vaga 134", "tel": ""},
+  {"nome": "Fernando", "vaga": "Lateral do Setor Verde • Vaga 58", "tel": ""},
+  {"nome": "Fernando Excursão", "vaga": "Lateral do Setor Branco • Vagas 01/02", "tel": ""},
+  {"nome": "Fernando Henrique Transportadora", "vaga": "Setor Azul - Área da Vans • Vaga 133", "tel": ""},
+  {"nome": "Flaviano Torres", "vaga": "Setor Azul • Vaga 116", "tel": ""},
+  {"nome": "Flavio Transportes", "vaga": "Lateral do Setor Laranja • Vaga 141/142", "tel": ""},
+  {"nome": "Flecha Azul Turismo", "vaga": "Setor Vermelho • Vaga 73", "tel": ""},
+  {"nome": "FMA Express", "vaga": "Setor Azul • Vaga 136", "tel": ""},
+  {"nome": "Formiga Transportes", "vaga": "Lateral do Setor Laranja • Vaga 42", "tel": ""},
+  {"nome": "Fox Tur", "vaga": "Setor Vermelho • Vaga 46", "tel": ""},
+  {"nome": "Fran Turismo", "vaga": "Setor Branco • Vaga 138", "tel": ""},
+  {"nome": "Francisco de Assis", "vaga": "Setor Amarelo • Vaga 06", "tel": ""},
+  {"nome": "Francisquinho", "vaga": "Lateral do Laranja • Vagas 143/144", "tel": ""},
+  {"nome": "Freitas Tur", "vaga": "Setor Branco • Vaga 124", "tel": ""},
+  {"nome": "Fumação Turismo", "vaga": "Setor Vermelho • Vaga 59", "tel": ""},
+  {"nome": "Gabrielly Tur", "vaga": "Setor Branco • Vaga 102", "tel": ""},
+  {"nome": "Galpão Transportes", "vaga": "Lateral do Setor Azul • Vaga 06", "tel": ""},
+  {"nome": "Gasparzinho", "vaga": "Setor Vermelho • Vaga 79/81/83/85/87/89", "tel": ""},
+  {"nome": "GDN Transportes", "vaga": "Setor Vermelho • Vaga 78", "tel": ""},
+  {"nome": "Gedron Viagens", "vaga": "Setor Branco • Vaga 118", "tel": ""},
+  {"nome": "Genilson Viagens", "vaga": "Setor Vermelho - Área das Vans • Vaga 71", "tel": ""},
+  {"nome": "Geová Viagens", "vaga": "Setor Verde - Hotéis • Vaga 67/69", "tel": ""},
+  {"nome": "Gil Entregas", "vaga": "Lateral do Setor Laranja • Vaga 132/133", "tel": ""},
+  {"nome": "Gilson Souza", "vaga": "Lateral do Setor Verde • Vaga 81", "tel": ""},
+  {"nome": "Ginal Tur", "vaga": "Setor Branco • Vaga 94", "tel": ""},
+  {"nome": "Gordinha Turismo", "vaga": "Setor Amarelo • Vaga 126", "tel": ""},
+  {"nome": "Gordinho das Encomendas", "vaga": "Setor Laranja • Vaga 127", "tel": ""},
+  {"nome": "Gorete & Jonson", "vaga": "Setor Azul • Vaga 124", "tel": ""},
+  {"nome": "Granpola Excursão", "vaga": "Setor Vermelho • Vaga 66,68", "tel": ""},
+  {"nome": "Greew Transportes", "vaga": "Lateral do Setor Azul • Vaga 15", "tel": ""},
+  {"nome": "Grilo Turismo", "vaga": "Lateral do Setor Branco • Vaga 37", "tel": ""},
+  {"nome": "Grupo Cacauzinho", "vaga": "Setor Branco • Vaga 83A", "tel": ""},
+  {"nome": "Grupo Eclipse", "vaga": "Setor Vermelho • Vaga 45", "tel": ""},
+  {"nome": "Guardiato Turismo", "vaga": "Setor Vermelho • Vaga 86", "tel": ""},
+  {"nome": "GV Viagens", "vaga": "Setor Amarelo • Vaga 12", "tel": ""},
+  {"nome": "GV Viagens - Gilson", "vaga": "Setor Vermelho • Vaga 60/61", "tel": ""},
+  {"nome": "Henrique Transporte", "vaga": "Setor Azul • Vaga 140", "tel": ""},
+  {"nome": "Hyggor Tur", "vaga": "Setor Branco • Vaga 100", "tel": ""},
+  {"nome": "Imperatur", "vaga": "Setor Branco • Vaga 109", "tel": ""},
+  {"nome": "Índio Viagens", "vaga": "Setor Branco • Vaga 112", "tel": ""},
+  {"nome": "Índya Tur", "vaga": "Setor Amarelo • Vaga 127", "tel": ""},
+  {"nome": "Iraildo Viagens", "vaga": "Setor Azul • Vaga 121", "tel": ""},
+  {"nome": "Iraneide Viagens", "vaga": "Setor Branco • Vaga 114", "tel": ""},
+  {"nome": "Iranildo", "vaga": "Setor Amarelo • Vaga 19", "tel": ""},
+  {"nome": "Irmão Val - Excursão", "vaga": "Setor Vermelho - Área das Vans • Vaga 66", "tel": ""},
+  {"nome": "Israel Tur", "vaga": "Setor Verde - Área das Vans • Vaga 66", "tel": ""},
+  {"nome": "Ito Viagens", "vaga": "Lateral do Setor Branco • Vaga 31", "tel": ""},
+  {"nome": "Ivânio", "vaga": "Setor Verde • Vaga 71", "tel": ""},
+  {"nome": "Izac Viagens", "vaga": "Setor Vermelho • Vaga 69", "tel": ""},
+  {"nome": "J Quaresma", "vaga": "Vaga 133", "tel": ""},
+  {"nome": "J Santos", "vaga": "Lateral do Setor Azul • Vaga 43", "tel": ""},
+  {"nome": "Jamstur", "vaga": "Setor Branco • Vaga 130", "tel": ""},
+  {"nome": "Jan Táxi (O Rei das Encomendas)", "vaga": "Lateral do Setor Laranja - Área das Vans • Vaga 107", "tel": ""},
+  {"nome": "Jandaia Logística", "vaga": "Lateral do Setor Azul • Vagas 17/19", "tel": ""},
+  {"nome": "JC Viagens", "vaga": "Setor Amarelo • Vaga 134/136", "tel": ""},
+  {"nome": "JD Tur", "vaga": "Lateral do Setor Laranja • Vaga 106", "tel": ""},
+  {"nome": "JD Turismo", "vaga": "Lateral do Setor Branco • Vaga 108", "tel": ""},
+  {"nome": "JK Excursão - Rio Tinto", "vaga": "Setor Laranja • Vaga 122", "tel": ""},
+  {"nome": "JKS Log Transportes", "vaga": "Setor Laranja - Área das Vans • Vaga 118", "tel": ""},
+  {"nome": "JM Transportes", "vaga": "Setor Amarelo • Vaga 108", "tel": ""},
+  {"nome": "Jó Turismo", "vaga": "Setor Vermelho • Vaga 86,88", "tel": ""},
+  {"nome": "João Sertanejo", "vaga": "Setor Vermelho • Vaga 72", "tel": ""},
+  {"nome": "Joãozinho Turismo", "vaga": "Setor Verde • Vaga 90A", "tel": ""},
+  {"nome": "Joca Turismo", "vaga": "Setor Vermelho • Vaga 61", "tel": ""},
+  {"nome": "Jonatas Turismo", "vaga": "Setro Amarelo • Vaga 06", "tel": ""},
+  {"nome": "Jones Transportes", "vaga": "Setor Laranja • Vaga 14", "tel": ""},
+  {"nome": "Josemar Viagens", "vaga": "Setor Amarelo • Vaga 49", "tel": ""},
+  {"nome": "Josevaldo Viagens", "vaga": "Frontal do - Setor Azul • Vaga 39", "tel": ""},
+  {"nome": "Josinelma Viagens", "vaga": "107 - Setor Branco • Vaga", "tel": ""},
+  {"nome": "Josivaldo", "vaga": "Setor Amarelo • Vaga 51", "tel": ""},
+  {"nome": "Josivan Viagens", "vaga": "Lateral do Setor Laranja • Vaga 130/131", "tel": ""},
+  {"nome": "JR Transporte", "vaga": "Setor Laranja - Área do Gerador • Vaga 04", "tel": ""},
+  {"nome": "JS Excursões", "vaga": "Lateral do Setor Laranja • Vaga 103", "tel": ""},
+  {"nome": "JS Globo", "vaga": "Setor Branco • Vaga 133", "tel": ""},
+  {"nome": "Júnior & Liliane Tur", "vaga": "Setro Amarelo - Área das Vans • Vaga 25", "tel": ""},
+  {"nome": "Junior da Baixada", "vaga": "Setor Branco • Vaga 136", "tel": ""},
+  {"nome": "Júnior do táxi- Viagens e Encomendas", "vaga": "Lateral do Setor Laranja • Vaga 104", "tel": ""},
+  {"nome": "Júnior e Eliane", "vaga": "Setor Vermelho • Vaga 68", "tel": ""},
+  {"nome": "Junior Excursão", "vaga": "Setor Laranja • Vaga 113/114", "tel": ""},
+  {"nome": "Junior Lotação", "vaga": "Setor Amarelo • Vaga 33", "tel": ""},
+  {"nome": "Júnior Tur", "vaga": "Lateral do Setor Branco • Vaga 44/45", "tel": ""},
+  {"nome": "Júnior Turismo", "vaga": "Setor Vermelho • Vaga 50,52", "tel": ""},
+  {"nome": "Júnior Viagens", "vaga": "Setor Vermelho • Vaga 82", "tel": ""},
+  {"nome": "Kaká Turismo", "vaga": "Setor Azul • Vaga 140", "tel": ""},
+  {"nome": "Kal Tour", "vaga": "Lateral do Setor Laranja • Vaga 27/29", "tel": ""},
+  {"nome": "Lapa Turismo", "vaga": "Setor Amarelo • Vaga 113", "tel": ""},
+  {"nome": "Lari Tur", "vaga": "Settor Amarelo • Vaga 101", "tel": ""},
+  {"nome": "LC Turismo e Transportes", "vaga": "Lateral do Setor Azul • Vaga 05", "tel": ""},
+  {"nome": "Leão Transpostes", "vaga": "Lateral do Setor Laranja • Vaga 108", "tel": ""},
+  {"nome": "Leonardo Viagens", "vaga": "Setor Amarelo • Vaga 34", "tel": ""},
+  {"nome": "Lêu Transportes", "vaga": "Setor Azul • Vaga 135", "tel": ""},
+  {"nome": "Li Tur", "vaga": "Lateral do Setor Laranja • Vaga 35", "tel": ""},
+  {"nome": "Lia Excursão", "vaga": "Setor Azul • Vaga 106", "tel": ""},
+  {"nome": "Lince Transportes", "vaga": "Lateral do Setor Azul • Vaga 03", "tel": ""},
+  {"nome": "Lindomar Viagens", "vaga": "Frontal do - Setor Azul • Vaga 79", "tel": ""},
+  {"nome": "Lino Excursão", "vaga": "Setor Azul • Vaga 129", "tel": ""},
+  {"nome": "Lins Viagens", "vaga": "Setor Laranja • Vaga 139/140", "tel": ""},
+  {"nome": "Litinho Excursão", "vaga": "Lateral do Setor Verde • Vaga 71", "tel": ""},
+  {"nome": "Locatur", "vaga": "Setor Amarelo • Vaga 44", "tel": ""},
+  {"nome": "Louro Tur", "vaga": "Setor Vermelho • Vaga 84 A", "tel": ""},
+  {"nome": "LR Eventos Viagens Turismo", "vaga": "Setor Verde - Área das vans • Vaga 68", "tel": ""},
+  {"nome": "LR Transportes", "vaga": "Lateral do Setor Azul • Vaga 27", "tel": ""},
+  {"nome": "LR Turismo", "vaga": "Setor Branco • Vaga 106", "tel": ""},
+  {"nome": "Lucas Tur", "vaga": "Lateral do Setor Laranja • Vaga 40", "tel": ""},
+  {"nome": "Luciano Excursão", "vaga": "Setor Azul - Área da Vans • Vaga 131", "tel": ""},
+  {"nome": "Luga Transporte", "vaga": "Setor Amarelo • Vaga 103", "tel": ""},
+  {"nome": "Luz Divína", "vaga": "Lateral do Setor Azul • Vaga 41", "tel": ""},
+  {"nome": "LV Turismo", "vaga": "Setor Verde • Vagas 76/78", "tel": ""},
+  {"nome": "LVC Tur", "vaga": "Lateral do Setor Azul • Vaga 14", "tel": ""},
+  {"nome": "M&F Excursão", "vaga": "Setor Amarelo • Vaga 118", "tel": ""},
+  {"nome": "MA Logistica", "vaga": "Setor Branco • Vaga 91", "tel": ""},
+  {"nome": "Mada Turismo", "vaga": "Setor Branco • Vaga 116", "tel": ""},
+  {"nome": "Magalhães Transportes", "vaga": "Setor Azul • Vaga 33", "tel": ""},
+  {"nome": "Mais Sonhos", "vaga": "Setor Amarelo • Vaga 104", "tel": ""},
+  {"nome": "Mano Viagens", "vaga": "Setor Verde • Vaga 74", "tel": ""},
+  {"nome": "Manoel Viagens", "vaga": "Setor Verde - Área das Vans • Vaga 93", "tel": ""},
+  {"nome": "Manuella Turismo", "vaga": "Setor Vermelho • Vaga 75", "tel": ""},
+  {"nome": "Marcelo", "vaga": "Setor Amarelo • Vaga 42", "tel": ""},
+  {"nome": "Marcelo Ceará", "vaga": "Setor Vermelho • Vaga 84", "tel": ""},
+  {"nome": "Marcelo Costa Transporte", "vaga": "Setor Verde • Vaga 49", "tel": ""},
+  {"nome": "Marcelo Tur", "vaga": "Setor Laranja • Vaga 13/15", "tel": ""},
+  {"nome": "Márcio Tur", "vaga": "Lateral do Setor Branco • Vaga 39", "tel": ""},
+  {"nome": "Marcondes Turismo", "vaga": "Setor Laranja • Vaga 145/146", "tel": ""},
+  {"nome": "Marcos Transportes", "vaga": "Lateral do Setor Laranja • Vaga 08", "tel": ""},
+  {"nome": "Marcos Viagens", "vaga": "Setor Vermelho • Vaga 77", "tel": ""},
+  {"nome": "Marlin Turismo", "vaga": "Setor Azul • Vaga 126", "tel": ""},
+  {"nome": "Marquinhos Viagens", "vaga": "Setor Verde • Vaga 66", "tel": ""},
+  {"nome": "Martins Tur", "vaga": "Setor Vermelho • Vaga 102", "tel": ""},
+  {"nome": "Martins Viagens", "vaga": "Setor Azul • Vaga 118", "tel": ""},
+  {"nome": "Mega Mix Tur", "vaga": "Lateral do Setor Branco • Vaga 11", "tel": ""},
+  {"nome": "Mendes Excursão", "vaga": "Lateral do Setor Branco • Vaga 21", "tel": ""},
+  {"nome": "Milena Excursão", "vaga": "Setor Vermelho • Vaga 82", "tel": ""},
+  {"nome": "Minervina", "vaga": "Setor Verde • Vaga 51", "tel": ""},
+  {"nome": "MP Turismo", "vaga": "Setor Verde • Vaga 47", "tel": ""},
+  {"nome": "MS Turismo - Mariazinha", "vaga": "Lateral do Setor Laranja • Vaga 115", "tel": ""},
+  {"nome": "MS Viagens", "vaga": "Setor Verde • Vaga 68/70", "tel": ""},
+  {"nome": "N&D Transportes", "vaga": "Setor Vermelho - Área da vans • Vaga 70", "tel": ""},
+  {"nome": "Nagibe Tur", "vaga": "Lateral do Setor Azul • Vaga 38", "tel": ""},
+  {"nome": "Nagilson Viagens", "vaga": "Setor Verde • Vaga 60", "tel": ""},
+  {"nome": "Nal Viagens", "vaga": "Lateral do Setor Branco - Área da vans • Vaga 43", "tel": ""},
+  {"nome": "Naldo Viagens", "vaga": "Setor Azul • Vaga 128", "tel": ""},
+  {"nome": "Naldo's Viagens", "vaga": "Setor Laranja • Vaga 147", "tel": ""},
+  {"nome": "Nelson Encomendas", "vaga": "Setror Verde - Área da vans • Vaga 69", "tel": ""},
+  {"nome": "Neno Turismo", "vaga": "Setor Amarelo • Vaga 38", "tel": ""},
+  {"nome": "Nildo Tur", "vaga": "Lateral do Setor Azul • Vaga 34", "tel": ""},
+  {"nome": "Nivaldo Tosi", "vaga": "Setor Amarelo • Vaga 109", "tel": ""},
+  {"nome": "Noélia Excursão", "vaga": "Setor Branco • Vagas 85/87", "tel": ""},
+  {"nome": "Nordeste Tur", "vaga": "Setor Vermelho • Vaga 90", "tel": ""},
+  {"nome": "Nova Jerusalém", "vaga": "Setor Verde • Vaga 88/90", "tel": ""},
+  {"nome": "Nova Tour", "vaga": "Lateral do Setor Verde • Vaga 61", "tel": ""},
+  {"nome": "NR Turismo", "vaga": "Lateral do Setor Laranja • Vaga 20/22", "tel": ""},
+  {"nome": "NT Express Logística", "vaga": "Lateral do Setor Branco • Vaga 06", "tel": ""},
+  {"nome": "Nunes Transportes", "vaga": "Lateral do Laranja • Vaga 126", "tel": ""},
+  {"nome": "O GRANDE Viagens & Turismo", "vaga": "Setor Laranja • Vaga 101", "tel": ""},
+  {"nome": "Oberdan", "vaga": "Lateral do Setor Azul • Vaga 20", "tel": ""},
+  {"nome": "Odilon", "vaga": "Setor Branco • Vaga 97", "tel": ""},
+  {"nome": "Oliveira Transporte", "vaga": "Lateral do Setor Azul • VAga 21/23", "tel": ""},
+  {"nome": "Opará", "vaga": "Setor Amarelo • Vaga 41", "tel": ""},
+  {"nome": "Orlando Transportes", "vaga": "Setor Branco • Vaga 113", "tel": ""},
+  {"nome": "P & R Viagens", "vaga": "Lateral do Setor Laranja • Vaga 00", "tel": ""},
+  {"nome": "P&R", "vaga": "Lateral do Setor Laranja • Vaga 00", "tel": ""},
+  {"nome": "Paiano Transporte", "vaga": "Lateral do Setor Azul • Vaga 12", "tel": ""},
+  {"nome": "Papa Tur", "vaga": "Setor Branco • Vaga 132", "tel": ""},
+  {"nome": "Papa-Léguas", "vaga": "Setor Verde • Vaga 50/52", "tel": ""},
+  {"nome": "Passarinho", "vaga": "Setor Vermelho • Vaga 73", "tel": ""},
+  {"nome": "Paulo - O Rei das Encomendas", "vaga": "Lateral do Setor Branco • Vagas 15/16", "tel": ""},
+  {"nome": "Paulo César", "vaga": "Lateral do Setor Laranja • Vaga 86", "tel": ""},
+  {"nome": "Paulo Viagens", "vaga": "Setor Azul • Vaga 127", "tel": ""},
+  {"nome": "Pedro Guarabira", "vaga": "Setor Azul • Vaga 119", "tel": ""},
+  {"nome": "Pedro Transportes", "vaga": "Setor Verde • Vaga 82", "tel": ""},
+  {"nome": "Pedro Transportes e Encomendas", "vaga": "Lateral do Setor Verde • Vaga 82", "tel": ""},
+  {"nome": "Pepeu", "vaga": "Setor Verde • Vaga 75", "tel": ""},
+  {"nome": "Pequeno Tansportes", "vaga": "Lateral do Setor Laranja • Vaga 136/137", "tel": ""},
+  {"nome": "Pingotur", "vaga": "Setor Azul • Vaga 31", "tel": ""},
+  {"nome": "Portal Transporte", "vaga": "Setor Vermelho • Vaga 49", "tel": ""},
+  {"nome": "PP Excursão", "vaga": "Lateral do Setor Laranja • Vaga 119", "tel": ""},
+  {"nome": "Preta Excursão", "vaga": "Lateral do Setor Verde • Vaga 55/56", "tel": ""},
+  {"nome": "Preto Tur", "vaga": "Lateral do Setor Azul • Vaga 42", "tel": ""},
+  {"nome": "Princípe Turismo", "vaga": "Setor Vermelho • Vaga 51/53", "tel": ""},
+  {"nome": "Rafa Tour PE", "vaga": "Setro Vermelho - Área das Vans • Vaga 85", "tel": ""},
+  {"nome": "Rafa Tur", "vaga": "Lateral do Setor Branco • Vaga 27", "tel": ""},
+  {"nome": "Rafael e Jô", "vaga": "Setor Verde • Vaga 62", "tel": ""},
+  {"nome": "Rafael Transportes", "vaga": "Setor Vermelho • Vaga 72", "tel": ""},
+  {"nome": "Raimundo Neto", "vaga": "Setor Laranja • Vaga 34", "tel": ""},
+  {"nome": "Raimundo Transportes", "vaga": "Setor Branco • Vaga 123/125", "tel": ""},
+  {"nome": "Ranilson Viagens", "vaga": "Lateral do Setor Laranja • Vaga 18", "tel": ""},
+  {"nome": "Rápido Transportes", "vaga": "Setor Verde • Vaga 49", "tel": ""},
+  {"nome": "Raudeck Viagens", "vaga": "Lateral do Setor Branco • Vaga 14", "tel": ""},
+  {"nome": "RB Transportes", "vaga": "Setor Branco • Vaga 115", "tel": ""},
+  {"nome": "Realeza Turismo", "vaga": "Setor Azul • Vaga 37", "tel": ""},
+  {"nome": "Redenção Turismo", "vaga": "Setor Amarelo • Vaga 13", "tel": ""},
+  {"nome": "Régis Viagens", "vaga": "Setor Verde • Vaga 59/61", "tel": ""},
+  {"nome": "Renascer Viagens", "vaga": "Lateral do Setor Azul • Vaga 39", "tel": ""},
+  {"nome": "Ricardo Moura Transporetes", "vaga": "Lateral do Setor Azul • Vaga 25", "tel": ""},
+  {"nome": "Rildo Mororó", "vaga": "Setor Vermelho • Vaga 66", "tel": ""},
+  {"nome": "Risetur Viagens", "vaga": "Setor Branco • Vaga 35", "tel": ""},
+  {"nome": "Roberto Excursão", "vaga": "Lateral do Setor Laranja • Vaga 134/135", "tel": ""},
+  {"nome": "Roberto Jr Turismo", "vaga": "Setor Verde • Vaga 49", "tel": ""},
+  {"nome": "Robson Viagens", "vaga": "Setor Vermelho • Vaga 101", "tel": ""},
+  {"nome": "Rodrigo Viagens", "vaga": "Lateral do Setor Branco • Vaga03/04", "tel": ""},
+  {"nome": "Rogerio Home Delivery", "vaga": "Lateral do Setor Verde • Vaga 75/76", "tel": ""},
+  {"nome": "Romário Viagens", "vaga": "Setor Laranja - Próximo ao Gerador • Vaga 07", "tel": ""},
+  {"nome": "Ronivon Transporte", "vaga": "Setor Laranja - Área do Gerador • Vaga 02", "tel": ""},
+  {"nome": "Rosa Branca", "vaga": "Setor Verde • Vaga 48A", "tel": ""},
+  {"nome": "Rosa Viagens", "vaga": "Lateral do Setor Verde • Vaga 47", "tel": ""},
+  {"nome": "Rosemário Tur", "vaga": "Lateral do Setor Vermelho • Vagas 92 / 93", "tel": ""},
+  {"nome": "Ruan Excursão", "vaga": "Lateral do Setor Branco • Vaga 32", "tel": ""},
+  {"nome": "Ruth Excursões", "vaga": "Setor Amarelo • Vaga 92", "tel": ""},
+  {"nome": "S&S Turismo", "vaga": "Setor Amarelo • Vaga 112", "tel": ""},
+  {"nome": "S.E - Excursão", "vaga": "Setor Branco • Vaga 110", "tel": ""},
+  {"nome": "Saldanha Turismo", "vaga": "Lateral do Setor Laranja • Vaga 24", "tel": ""},
+  {"nome": "Sales Emcomendas", "vaga": "Lateral do Setor Laranja • Vaga 89", "tel": ""},
+  {"nome": "Salmo 40", "vaga": "Setor Amarelo • Vaga 15", "tel": ""},
+  {"nome": "Samara & Pedro Excursão", "vaga": "Setor Azul • Vaga 123", "tel": ""},
+  {"nome": "Sambus", "vaga": "Setor Vermelho • Vaga 47", "tel": ""},
+  {"nome": "Sandra Turismo", "vaga": "Setor Verde • Vaga 56/58", "tel": ""},
+  {"nome": "Santana Tur", "vaga": "Setor Amarelo • Vaga 106", "tel": ""},
+  {"nome": "Santos Tur", "vaga": "Lateral do Setor Azul • Vagas 22,24", "tel": ""},
+  {"nome": "Seg Log", "vaga": "Lateral do Setor Laranja • Vaga 98", "tel": ""},
+  {"nome": "Sérgio Carvalho - Coleta e Entregas", "vaga": "Lateral do Setor Laranja • Vaga 116", "tel": ""},
+  {"nome": "Severino Tur", "vaga": "Lateral do Setor Verde • Vaga 63", "tel": ""},
+  {"nome": "Sheyla Viagens", "vaga": "Setor Verde • Vaga 45", "tel": ""},
+  {"nome": "Sidney Turismo", "vaga": "Lateral do Setor Laranja • Vaga 46", "tel": ""},
+  {"nome": "Silva Tur", "vaga": "Setor Branco • Vaga 119", "tel": ""},
+  {"nome": "Silvania & Carlinhos Turismo", "vaga": "Lateral do Setor Verde • Vaga 54", "tel": ""},
+  {"nome": "Simão Turismo", "vaga": "Setor Amarelo • Vaga 128", "tel": ""},
+  {"nome": "Sinval Tur", "vaga": "Setor Vermelho • Vaga 62", "tel": ""},
+  {"nome": "Sirley Turismo", "vaga": "Lateral do Setor Laranja • Vaga 37", "tel": ""},
+  {"nome": "Sisal Tur", "vaga": "Setor Verde • Vaga 83", "tel": ""},
+  {"nome": "SM Transportes", "vaga": "Setor Branco • Vaga 144", "tel": ""},
+  {"nome": "SN Viagens", "vaga": "Setor Branco • Vaga 89", "tel": ""},
+  {"nome": "Socorro Turismo", "vaga": "Setor Verde • Vaga 45", "tel": ""},
+  {"nome": "Sr. Chico Viagens", "vaga": "Setor Amarelo • Vaga 29", "tel": ""},
+  {"nome": "Suênio Viagens", "vaga": "Lateral do Setor Branco • Vaga 28", "tel": ""},
+  {"nome": "Tagitur", "vaga": "Setor Branco • Vaga 120/122", "tel": ""},
+  {"nome": "Taty Tur", "vaga": "Setor Amarelo • Vaga 100", "tel": ""},
+  {"nome": "Thiago Transporte", "vaga": "Lateral do Setor Laranja • Vaga 112", "tel": ""},
+  {"nome": "Tião Viagens", "vaga": "Setor Amarelo • Vaga 54", "tel": ""},
+  {"nome": "Toinho da Van", "vaga": "Setor Amarelo • Vaga 53", "tel": ""},
+  {"nome": "Tom Viagens", "vaga": "Setor Verde • Vaga 60", "tel": ""},
+  {"nome": "Trans Capelão", "vaga": "Setor Verde • Vaga 85", "tel": ""},
+  {"nome": "Trans Costa", "vaga": "Setor Amarelo • Vaga 98", "tel": ""},
+  {"nome": "Trans Junior", "vaga": "Setor Branco • Vaga 96/98", "tel": ""},
+  {"nome": "Trans Lauren", "vaga": "Setor Amarelo • Vaga 111", "tel": ""},
+  {"nome": "Trans Ribeiro", "vaga": "Setor Laranja • Vaga 41", "tel": ""},
+  {"nome": "Translog", "vaga": "Setor Branco • Vaga 142", "tel": ""},
+  {"nome": "Transmarques", "vaga": "Setor Amarelo • Vaga 27", "tel": ""},
+  {"nome": "Transmedeiros (Erivan)", "vaga": "Setor Azul • Vaga 139", "tel": ""},
+  {"nome": "Transpires", "vaga": "Setor Verde • Vaga 82", "tel": ""},
+  {"nome": "Tropical Tur", "vaga": "Setor Branco • Vaga 104", "tel": ""},
+  {"nome": "União Tur", "vaga": "Setor Verde • Vaga 80", "tel": ""},
+  {"nome": "Val Tur", "vaga": "Setor Vermelho • Vaga 71", "tel": ""},
+  {"nome": "Van do Gago", "vaga": "Setor Amarelo • Vaga 8", "tel": ""},
+  {"nome": "Vânia Turismo", "vaga": "Setor Branco • Vaga 135", "tel": ""},
+  {"nome": "Véi Excursão", "vaga": "Setor Verde - Área das Vans • Vaga 42", "tel": ""},
+  {"nome": "Velox Transporte", "vaga": "Setor Laranja - Área do Gerador • Vaga 11", "tel": ""},
+  {"nome": "Veronice Turismo", "vaga": "Setor Amarelo • Vaga 100", "tel": ""},
+  {"nome": "Via Direta Turismo", "vaga": "Setor Vermelho • Vaga 81", "tel": ""},
+  {"nome": "Via Monte Viagens", "vaga": "Setor Vermelho • Vaga 76", "tel": ""},
+  {"nome": "Vila Turismo", "vaga": "Setor Branco • Vaga 137", "tel": ""},
+  {"nome": "Viviane Bispo Viagens", "vaga": "Setor Vermelho • Vaga 103", "tel": ""},
+  {"nome": "W.D. TRANSPORTE E ACESSÓRIA", "vaga": "Setor AMarelo • Vaga 130", "tel": ""},
+  {"nome": "Wallace Tur", "vaga": "Setor Amarelo • Vaga 01", "tel": ""},
+  {"nome": "Washington Tur / Rawa Transportes", "vaga": "Setor Laranja • Vagas 01/03/05/07/09", "tel": ""},
+  {"nome": "Welligton Tur", "vaga": "Lateral do Setor Verde • Vaga 62", "tel": ""},
+  {"nome": "WN Transportes", "vaga": "Setor Amarelo • Vaga 105", "tel": ""},
+  {"nome": "Xavier Tur", "vaga": "Setor Verde • Vaga 64", "tel": ""},
+  {"nome": "Zanchecttur", "vaga": "Lateral do Setor Azul • Vagas 16,018", "tel": ""},
+  {"nome": "Zé Cardoso Turismo", "vaga": "Setor Verde • Vaga 81", "tel": ""},
+  {"nome": "Zé Maria Transportes", "vaga": "95 - Setor Branco • Vaga", "tel": ""},
+  {"nome": "Zé Pereira Turismo", "vaga": "Setor Verde • Vaga 92", "tel": ""},
+  {"nome": "Zeca Tur", "vaga": "Setor Amarelo • Vaga 48", "tel": ""},
+  {"nome": "Zezinho Excursão", "vaga": "Lateral do Setor Branco • Vaga 41", "tel": ""},
+  {"nome": "Zito Galego Viagens", "vaga": "Setor Azul • Vaga 114", "tel": ""}
+];
+
+/* ============== ESTADO ============== */
+const LS_DADOS="tx_dados", LS_BASE="tx_base";
+let dados = JSON.parse(localStorage.getItem(LS_DADOS) || "{}");      // { chave: {nome,cobra,valor,obs,data,origem,vaga,nova} }
+let base  = JSON.parse(localStorage.getItem(LS_BASE) || "null") || SEED.slice();
+let filtro = "todas";
+let editandoChave = null, cobraTmp = null;
+
+function salvarDados(){ localStorage.setItem(LS_DADOS, JSON.stringify(dados)); }
+function salvarBase(){ localStorage.setItem(LS_BASE, JSON.stringify(base)); }
+function chave(n){ return n.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim(); }
+
+/* ============== ITENS (base + registros + novas) ============== */
+function todosItens(){
+  const mapa = {};
+  base.forEach(e=>{ mapa[chave(e.nome)] = {nome:e.nome, origem:e.origem||"", vaga:e.vaga||"", tel:e.tel||"", reg:null}; });
+  Object.keys(dados).forEach(k=>{
+    const r = dados[k];
+    if(!mapa[k]) mapa[k] = {nome:r.nome, origem:r.origem||"", vaga:r.vaga||"", tel:"", reg:null, nova:true};
+    mapa[k].reg = r;
+  });
+  return Object.values(mapa).sort((a,b)=>a.nome.localeCompare(b.nome,'pt'));
+}
+
+/* ============== RENDER ============== */
+function render(){
+  const termo = chave(document.getElementById("busca").value);
+  const itens = todosItens();
+
+  // contagens
+  let total=itens.length, conf=0, cobram=0, naoc=0;
+  itens.forEach(i=>{ if(i.reg){ conf++; if(i.reg.cobra==="sim") cobram++; else naoc++; }});
+  document.getElementById("counter").innerHTML =
+    `<b>${conf}</b> conferidas de ${total} · faltam <b>${total-conf}</b>`;
+
+  // chips
+  const defs=[["todas","Todas",total],["pend","Falta conferir",total-conf],["sim","Cobram taxa",cobram],["nao","Não cobram",naoc]];
+  document.getElementById("chips").innerHTML = defs.map(([f,l,n])=>
+    `<div class="chip ${filtro===f?'on':''}" onclick="setFiltro('${f}')">${l}<span class="n">${n}</span></div>`).join("");
+
+  // filtra
+  let vis = itens.filter(i=>{
+    if(filtro==="pend" && i.reg) return false;
+    if(filtro==="sim" && !(i.reg && i.reg.cobra==="sim")) return false;
+    if(filtro==="nao" && !(i.reg && i.reg.cobra==="nao")) return false;
+    if(termo && chave(i.nome).indexOf(termo)<0 && chave(i.vaga).indexOf(termo)<0) return false;
+    return true;
+  });
+
+  const lista = document.getElementById("lista");
+  if(!vis.length){
+    lista.innerHTML = `<div class="empty"><div class="big">🔍</div>Nenhuma excursão aqui.<br>${termo?'Tente outro nome ou ':''}use o botão <b>＋ Nova</b> pra adicionar.</div>`;
+    return;
+  }
+  lista.innerHTML = vis.map(i=>{
+    const k = chave(i.nome);
+    let badge, cls="";
+    if(!i.reg){ badge = `<div class="badge b-pend">conferir</div>`; }
+    else if(i.reg.cobra==="nao"){ badge = `<div class="badge b-nao">sem taxa</div>`; cls="s-nao"; }
+    else { badge = `<div class="badge b-sim">taxa<span class="v">R$ ${fmt(i.reg.valor)}</span></div>`; cls="s-sim"; }
+    const meta = i.vaga || "";
+    return `<div class="card ${cls}" onclick="abrirEditor('${k.replace(/'/g,"\\'")}')">
+      <div class="body">
+        <div class="nome">${esc(i.nome)}${i.nova?'<span class="nova-tag">NOVA</span>':''}</div>
+        ${meta?`<div class="meta">${esc(meta)}</div>`:''}
+      </div>${badge}</div>`;
+  }).join("");
+}
+function fmt(v){ const n=parseFloat(v||0); return n.toFixed(2).replace(".",","); }
+function esc(s){ return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function setFiltro(f){ filtro=f; render(); }
+
+/* ============== EDITOR ============== */
+function abrirEditor(k){
+  const it = todosItens().find(i=>chave(i.nome)===k);
+  if(!it) return;
+  editandoChave = k;
+  document.getElementById("edNome").textContent = it.nome;
+  document.getElementById("edMeta").textContent = it.vaga || "Sem dados de vaga";
+  const r = it.reg;
+  cobraTmp = r ? r.cobra : null;
+  document.getElementById("edValor").value = r && r.valor ? r.valor : "";
+  document.getElementById("edObs").value = r && r.obs ? r.obs : "";
+  document.getElementById("limparWrap").style.display = r ? "flex" : "none";
+  pintarSeg();
+  abrir("ovEditor");
+}
+function setCobra(v){ cobraTmp=v; pintarSeg(); }
+
+/* ============== EDITAR DADOS DA EXCURSÃO ============== */
+let editInfoChave=null;
+function abrirEditInfo(){
+  const it = todosItens().find(i=>chave(i.nome)===editandoChave);
+  if(!it) return;
+  editInfoChave = editandoChave;
+  document.getElementById("eiNome").value = it.nome;
+  document.getElementById("eiVaga").value = it.vaga||"";
+  abrir("ovEditInfo");
+}
+function salvarEditInfo(){
+  const novoNome=document.getElementById("eiNome").value.trim();
+  if(!novoNome){ toast("O nome não pode ficar vazio"); return; }
+  const novaChave=chave(novoNome);
+  if(novaChave!==editInfoChave && todosItens().some(i=>chave(i.nome)===novaChave)){
+    toast("Já existe outra excursão com esse nome"); return;
+  }
+  const origem="";
+  const vaga=document.getElementById("eiVaga").value.trim();
+  // atualiza (ou cria) na base
+  const bi=base.find(b=>chave(b.nome)===editInfoChave);
+  if(bi){ bi.nome=novoNome; bi.origem=origem; bi.vaga=vaga; }
+  else { base.push({nome:novoNome, origem, vaga, tel:"", nova:true}); }
+  salvarBase();
+  // migra a marcação de taxa, se houver
+  if(dados[editInfoChave]){
+    const r=dados[editInfoChave];
+    r.nome=novoNome; r.origem=origem; r.vaga=vaga;
+    if(novaChave!==editInfoChave){ dados[novaChave]=r; delete dados[editInfoChave]; }
+    salvarDados();
+  }
+  editandoChave=novaChave;
+  fechar("ovEditInfo"); fechar("ovEditor"); render(); toast("Dados atualizados ✓");
+}
+function pintarSeg(){
+  const sN=document.getElementById("segNao"), sS=document.getElementById("segSim");
+  sN.className = cobraTmp==="nao" ? "on-nao":"";
+  sS.className = cobraTmp==="sim" ? "on-sim":"";
+  document.getElementById("valorWrap").classList.toggle("hide", cobraTmp!=="sim");
+}
+function salvarRegistro(){
+  if(!cobraTmp){ toast("Marque se cobra taxa ou não"); return; }
+  let valor=0;
+  if(cobraTmp==="sim"){
+    valor = parseFloat((document.getElementById("edValor").value||"").replace(",","."));
+    if(!valor || valor<=0){ toast("Digite o valor da taxa"); return; }
+  }
+  const it = todosItens().find(i=>chave(i.nome)===editandoChave);
+  dados[editandoChave] = {
+    nome: it.nome, cobra: cobraTmp, valor: cobraTmp==="sim"?valor:0,
+    obs: document.getElementById("edObs").value.trim(),
+    data: new Date().toISOString(),
+    origem: it.origem||"", vaga: it.vaga||"", nova: !!it.nova
+  };
+  salvarDados(); fechar("ovEditor"); render(); toast("Salvo ✓");
+}
+function limparRegistro(){
+  if(editandoChave && dados[editandoChave]){ delete dados[editandoChave]; salvarDados(); }
+  fechar("ovEditor"); render(); toast("Marcação apagada");
+}
+
+/* ============== NOVA EXCURSÃO ============== */
+function novaExcursao(){
+  document.getElementById("nvNome").value="";
+  document.getElementById("nvSetor").value="";
+  document.getElementById("nvNumero").value="";
+  abrir("ovNova");
+}
+function salvarNova(){
+  const nome=document.getElementById("nvNome").value.trim();
+  if(!nome){ toast("Digite o nome da excursão"); return; }
+  const k=chave(nome);
+  if(todosItens().some(i=>chave(i.nome)===k)){ toast("Essa excursão já existe na lista"); return; }
+  const setor=document.getElementById("nvSetor").value;
+  const numero=document.getElementById("nvNumero").value.trim();
+  let vaga="";
+  if(numero && setor) vaga=`Setor ${setor} • Vaga ${numero}`;
+  else if(numero) vaga=`Vaga ${numero}`;
+  else if(setor) vaga=`Setor ${setor}`;
+  base.push({nome, origem:"", vaga, tel:"", nova:true});
+  salvarBase();
+  fechar("ovNova"); render();
+  setTimeout(()=>abrirEditor(k),150);
+}
+
+/* ============== EXPORTAR ============== */
+function exportar(){
+  if(!Object.keys(dados).length){ toast("Você ainda não marcou nenhuma excursão"); return; }
+  const pacote = { tipo:"taxas-excursoes", exportadoEm:new Date().toISOString(), registros:dados };
+  baixar(JSON.stringify(pacote,null,2), `taxas-${hoje()}-${horaMin()}.json`);
+  toast("Arquivo gerado — mande no WhatsApp 📤");
+}
+function exportarComprovante(){
+  const taxas = Object.values(dados).filter(r=>r.cobra==="sim")
+    .map(r=>({nome:r.nome, chave:chave(r.nome), valor:r.valor}))
+    .sort((a,b)=>a.nome.localeCompare(b.nome,'pt'));
+  if(!taxas.length){ toast("Nenhuma excursão com taxa marcada ainda"); return; }
+  const pacote = { tipo:"taxas-para-comprovante", geradoEm:new Date().toISOString(), total:taxas.length, taxas };
+  baixar(JSON.stringify(pacote,null,2), `taxas-para-comprovante-${hoje()}.json`);
+  toast(`${taxas.length} excursões com taxa exportadas 🧾`);
+}
+
+/* ============== IMPORTAR / JUNTAR ============== */
+function abrirImport(){ document.getElementById("importResultado").innerHTML=""; fechar("ovMenu"); abrir("ovImport"); }
+let conflitosPend=[];
+function processarImport(ev){
+  const files=[...ev.target.files]; if(!files.length) return;
+  let add=0, upd=0, igual=0; conflitosPend=[];
+  let lidos=0;
+  files.forEach(f=>{
+    const fr=new FileReader();
+    fr.onload=()=>{
+      try{
+        const p=JSON.parse(fr.result);
+        const regs = p.registros || p; // aceita pacote ou mapa cru
+        Object.keys(regs).forEach(k=>{
+          const inc=regs[k]; if(!inc||!inc.nome) return;
+          const kk=chave(inc.nome);
+          const atual=dados[kk];
+          if(!atual){ dados[kk]=inc; add++; }
+          else if(atual.cobra===inc.cobra && (atual.valor||0)===(inc.valor||0)){ igual++; }
+          else{
+            // conflito: valores diferentes
+            conflitosPend.push({k:kk, nome:inc.nome, local:atual, importado:inc});
+            // fica com o mais recente por enquanto
+            if(new Date(inc.data||0) > new Date(atual.data||0)){ dados[kk]=inc; upd++; } else upd++;
+          }
+        });
+      }catch(e){ toast("Um arquivo está em formato inválido"); }
+      lidos++;
+      if(lidos===files.length){ salvarDados(); mostrarResumoImport(add,upd,igual); render(); }
+    };
+    fr.readAsText(f);
+  });
+}
+function mostrarResumoImport(add,upd,igual){
+  let html=`<div class="resumo">
+    <div class="lin">Novas adicionadas <b style="color:var(--verde)">${add}</b></div>
+    <div class="lin">Atualizadas <b style="color:var(--azul)">${upd}</b></div>
+    <div class="lin">Já estavam iguais <b>${igual}</b></div>
+    <div class="lin">Conflitos pra revisar <b style="color:var(--ambar)">${conflitosPend.length}</b></div>
+  </div>`;
+  if(conflitosPend.length){
+    html+=`<div class="sub" style="margin-bottom:10px">⚠️ Valores diferentes pra mesma excursão. Escolha qual manter:</div>`;
+    conflitosPend.forEach((c,i)=>{
+      html+=`<div class="conf-box" id="cf${i}">
+        <div class="t">${esc(c.nome)}</div>
+        <div style="font-size:13px">Seu / atual: <b>${rotulo(c.local)}</b></div>
+        <div style="font-size:13px">Importado: <b>${rotulo(c.importado)}</b></div>
+        <div class="conf-opt">
+          <button onclick="resolver(${i},'local')">Manter o meu</button>
+          <button onclick="resolver(${i},'importado')">Usar importado</button>
+        </div></div>`;
+    });
+  }
+  document.getElementById("importResultado").innerHTML=html;
+}
+function rotulo(r){ return r.cobra==="sim" ? "R$ "+fmt(r.valor) : "sem taxa"; }
+function resolver(i,qual){
+  const c=conflitosPend[i];
+  dados[c.k] = qual==="local" ? c.local : c.importado;
+  salvarDados(); render();
+  const box=document.getElementById("cf"+i); if(box){ box.style.opacity=.4; box.querySelector(".conf-opt").innerHTML='<div style="text-align:center;width:100%;color:var(--verde);font-weight:700">Resolvido ✓</div>'; }
+}
+
+/* ============== CARREGAR LISTA COMPLETA ============== */
+function importarLista(){ fechar("ovMenu"); document.getElementById("fileLista").click(); }
+function processarLista(ev){
+  const f=ev.target.files[0]; if(!f) return;
+  const fr=new FileReader();
+  fr.onload=()=>{
+    try{
+      const p=JSON.parse(fr.result);
+      const arr = Array.isArray(p) ? p : (p.excursoes||p.base);
+      if(!Array.isArray(arr)) throw 0;
+      base = arr.map(e=>({nome:e.nome, origem:e.origem||"", vaga:e.vaga||"", tel:e.tel||e.telefone||""})).filter(e=>e.nome);
+      salvarBase(); render(); toast(base.length+" excursões carregadas ✓");
+    }catch(e){ toast("Arquivo de lista inválido"); }
+  };
+  fr.readAsText(f);
+}
+
+/* ============== UTIL ============== */
+function limparTudo(){
+  fechar("ovMenu");
+  if(confirm("Apagar TODAS as marcações deste aparelho? A lista de excursões continua.")){
+    dados={}; salvarDados(); render(); toast("Marcações apagadas");
+  }
+}
+function abrirMenu(){ document.getElementById("menuSub").textContent = `${Object.keys(dados).length} excursões marcadas neste aparelho`; abrir("ovMenu"); }
+function abrir(id){ document.getElementById(id).classList.add("open"); }
+function fechar(id){ document.getElementById(id).classList.remove("open"); }
+function baixar(txt,nome){
+  const b=new Blob([txt],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download=nome; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function slug(s){ return chave(s).replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""); }
+function hoje(){ const d=new Date(); return d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0"); }
+function horaMin(){ const d=new Date(); return String(d.getHours()).padStart(2,"0")+String(d.getMinutes()).padStart(2,"0"); }
+let toastT;
+function toast(m){ const t=document.getElementById("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),2400); }
+
+// fechar overlay tocando no fundo
+document.querySelectorAll(".overlay").forEach(o=>o.addEventListener("click",e=>{ if(e.target===o) o.classList.remove("open"); }));
+
+/* ============== TEMA ============== */
+function toggleTema(){
+  const dark=document.body.classList.toggle("dark");
+  localStorage.setItem("tx_tema", dark?"dark":"claro");
+  sincTema(dark);
+}
+function sincTema(dark){
+  document.getElementById("themeBtn").textContent = dark?"☀️":"🌙";
+  const ti=document.getElementById("temaIcon"); if(ti) ti.textContent = dark?"☀️":"🌙";
+  const mc=document.querySelector('meta[name="theme-color"]'); if(mc) mc.setAttribute("content", dark?"#0f1724":"#1565C0");
+}
+
+/* ============== START ============== */
+if(localStorage.getItem("tx_tema")==="dark"){ document.body.classList.add("dark"); }
+sincTema(document.body.classList.contains("dark"));
+render();
+</script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}</script>
+</body>
+</html>
