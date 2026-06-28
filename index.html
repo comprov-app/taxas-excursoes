@@ -160,6 +160,12 @@
   .valor-input{display:flex; align-items:center; border:1.5px solid var(--ambar); border-radius:12px; background:var(--input-focus); overflow:hidden}
   .valor-input span{padding:0 4px 0 14px; font-size:18px; font-weight:800; color:var(--ambar)}
   .valor-input input{border:none; background:transparent; font-size:22px; font-weight:800; padding:13px 8px; width:100%; outline:none; color:var(--ambar)}
+  .valor-seg{display:flex; gap:10px}
+  .valor-seg button{
+    flex:1; border:1.5px solid var(--linha); background:var(--input-bg); border-radius:12px;
+    padding:16px 8px; font-size:19px; font-weight:800; cursor:pointer; color:var(--suave);
+  }
+  .valor-seg button.on{background:var(--ambar-bg); border-color:var(--ambar); color:var(--ambar)}
   .btn{
     width:100%; border:none; border-radius:14px; padding:16px; font-size:16px;
     font-weight:800; cursor:pointer; margin-top:6px;
@@ -245,9 +251,9 @@
         <button id="segSim" onclick="setCobra('sim')">Cobra taxa</button>
       </div>
       <div class="valor-wrap hide" id="valorWrap">
-        <div class="valor-input">
-          <span>R$</span>
-          <input id="edValor" type="number" inputmode="decimal" step="0.50" placeholder="0,00">
+        <div class="valor-seg">
+          <button type="button" id="val5" onclick="setValor(5)">R$ 5</button>
+          <button type="button" id="val10" onclick="setValor(10)">R$ 10</button>
         </div>
       </div>
     </div>
@@ -738,7 +744,7 @@ const LS_DADOS="tx_dados", LS_BASE="tx_base";
 let dados = JSON.parse(localStorage.getItem(LS_DADOS) || "{}");      // { chave: {nome,cobra,valor,obs,data,origem,vaga,nova} }
 let base  = JSON.parse(localStorage.getItem(LS_BASE) || "null") || SEED.slice();
 let filtro = "todas";
-let editandoChave = null, cobraTmp = null;
+let editandoChave = null, cobraTmp = null, valorTmp = 0;
 
 function salvarDados(){ localStorage.setItem(LS_DADOS, JSON.stringify(dados)); }
 function salvarBase(){ localStorage.setItem(LS_BASE, JSON.stringify(base)); }
@@ -813,13 +819,14 @@ function abrirEditor(k){
   document.getElementById("edMeta").textContent = it.vaga || "Sem dados de vaga";
   const r = it.reg;
   cobraTmp = r ? r.cobra : null;
-  document.getElementById("edValor").value = r && r.valor ? r.valor : "";
+  valorTmp = r && r.valor ? r.valor : 0;
   document.getElementById("edObs").value = r && r.obs ? r.obs : "";
   document.getElementById("limparWrap").style.display = r ? "flex" : "none";
   pintarSeg();
   abrir("ovEditor");
 }
 function setCobra(v){ cobraTmp=v; pintarSeg(); }
+function setValor(v){ valorTmp=v; pintarSeg(); }
 
 /* ============== EDITAR DADOS DA EXCURSÃO ============== */
 let editInfoChave=null;
@@ -860,13 +867,15 @@ function pintarSeg(){
   sN.className = cobraTmp==="nao" ? "on-nao":"";
   sS.className = cobraTmp==="sim" ? "on-sim":"";
   document.getElementById("valorWrap").classList.toggle("hide", cobraTmp!=="sim");
+  document.getElementById("val5").className  = valorTmp===5  ? "on" : "";
+  document.getElementById("val10").className = valorTmp===10 ? "on" : "";
 }
 function salvarRegistro(){
   if(!cobraTmp){ toast("Marque se cobra taxa ou não"); return; }
   let valor=0;
   if(cobraTmp==="sim"){
-    valor = parseFloat((document.getElementById("edValor").value||"").replace(",","."));
-    if(!valor || valor<=0){ toast("Digite o valor da taxa"); return; }
+    valor = valorTmp;
+    if(!valor || valor<=0){ toast("Toque em R$ 5 ou R$ 10"); return; }
   }
   const it = todosItens().find(i=>chave(i.nome)===editandoChave);
   dados[editandoChave] = {
